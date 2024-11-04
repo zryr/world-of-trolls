@@ -1,0 +1,55 @@
+-- Define the full paths to each ProximityPrompt
+local function findProximityPrompt(anvilName)
+    return workspace:FindFirstChild("Map")
+        and workspace.Map:FindFirstChild("ForgingCenter")
+        and workspace.Map.ForgingCenter:FindFirstChild("ForgingPlate")
+        and workspace.Map.ForgingCenter.ForgingPlate:FindFirstChild(anvilName)
+        and workspace.Map.ForgingCenter.ForgingPlate[anvilName]:FindFirstChild("ProximityPromptPart")
+        and workspace.Map.ForgingCenter.ForgingPlate[anvilName].ProximityPromptPart:FindFirstChildOfClass("ProximityPrompt")
+end
+
+local mysteriousAnvilPrompt = findProximityPrompt("MysteriousAnvil")
+local bloodAnvilPrompt = findProximityPrompt("BloodAnvil")
+local sorrowAnvilPrompt = findProximityPrompt("SorrowAnvil")
+
+-- Function to interact with a proximity prompt
+local function interactWithPrompt(proximityPrompt)
+    if proximityPrompt and proximityPrompt:IsA("ProximityPrompt") then
+        fireproximityprompt(proximityPrompt)
+    else
+        warn("ProximityPrompt not found.")
+    end
+end
+
+-- Check proximity and interact automatically for each prompt
+local function checkProximityAndInteract(proximityPrompt)
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+    while true do
+        wait(0.1) -- Check every 0.1 seconds
+        if (humanoidRootPart.Position - proximityPrompt.Parent.Position).Magnitude <= proximityPrompt.MaxActivationDistance then
+            interactWithPrompt(proximityPrompt)
+        end
+    end
+end
+
+-- Start checking proximity and interacting with each anvil's prompt
+if mysteriousAnvilPrompt then
+    spawn(function() checkProximityAndInteract(mysteriousAnvilPrompt) end)
+else
+    warn("ProximityPrompt not found for MysteriousAnvil.")
+end
+
+if bloodAnvilPrompt then
+    spawn(function() checkProximityAndInteract(bloodAnvilPrompt) end)
+else
+    warn("ProximityPrompt not found for BloodAnvil.")
+end
+
+if sorrowAnvilPrompt then
+    spawn(function() checkProximityAndInteract(sorrowAnvilPrompt) end)
+else
+    warn("ProximityPrompt not found for SorrowAnvil.")
+end
